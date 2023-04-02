@@ -1,0 +1,37 @@
+version: '3'
+
+services:
+  sshfs-turris:
+    image: ghcr.io/pschmitt/sshfs
+    restart: unless-stopped
+    privileged: true
+    # FIXME Below causes the container to just run forever
+    # ie it cannot be killed.
+    # cap_add:
+    #   - SYS_ADMIN
+    # devices:
+    #   - /dev/fuse:/dev/fuse
+    environment:
+      - PORT=22
+      - UID=1000
+      - GID=1000
+    volumes:
+      - ./config/sshfs/id_ed25519:/config/id_ed25519:ro
+      - ./mnt:/mount:shared
+    command: root@turris.lan:/
+
+  autorestic-turris:
+    image: ghcr.io/pschmitt/autorestic
+    hostname: turris
+    volumes:
+      - ./mnt:/mnt
+      - ./data/autorestic/entrypoint.sh:/entrypoint.sh:ro
+    entrypoint: ["/entrypoint.sh"]
+
+# volumes:
+#   turris:
+#     driver: ucphhpc/sshfs:latest
+#     driver_opts:
+#       sshcmd: "root@10.5.0.1:/"
+#       sshkey: /home/pschmitt/.ssh/id_ed25519
+#       allow_other: ""
