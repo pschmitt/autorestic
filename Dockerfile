@@ -8,7 +8,7 @@ RUN apk add --no-cache git && \
   go build
 
 FROM alpine:edge
-RUN apk add --no-cache bash ca-certificates fuse rclone restic sshfs tzdata
+RUN apk add --no-cache bash ca-certificates fuse rclone restic tzdata
 COPY --from=builder /app/autorestic /usr/bin/autorestic
 ENTRYPOINT []
-CMD [ "autorestic" ]
+CMD ["autorestic"]
