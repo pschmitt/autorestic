@@ -1,14 +1,9 @@
-FROM golang:1.23-alpine as builder
-
-WORKDIR /app
-COPY go.* .
-RUN apk add --no-cache git && \
-  git clone https://github.com/cupcakearmy/autorestic.git /app && \
-  go mod download && \
-  go build
+# hadolint ignore=DL3007
+FROM cupcakearmy/autorestic:latest AS autorestic
 
 FROM alpine:edge
+COPY --from=autorestic /usr/bin/autorestic /usr/bin/autorestic
+# hadolint ignore=DL3018
 RUN apk add --no-cache bash ca-certificates curl fuse rclone restic tzdata
-COPY --from=builder /app/autorestic /usr/bin/autorestic
 ENTRYPOINT []
 CMD ["autorestic"]
